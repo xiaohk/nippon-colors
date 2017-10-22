@@ -153,10 +153,3 @@ def generate_markdown(out_fname):
 
 
 generate_markdown("README.md")
-#convert_json('colors.json', 'nippon_colors.json')
-#with open('nippon_colors.json', 'r') as fp:
-#    color_list = load(fp)
-#    for color in color_list:
-#        if len(color['romanji']) > 11:
-#            generate_svg(color)
-    #generate_svg(color_list[46])
