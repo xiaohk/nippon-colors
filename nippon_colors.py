@@ -83,8 +83,9 @@ def generate_svg(color_dic):
 
     # Different Positions/size based on the length of kanji and romanji
 
-    kanji_x, kanji_y, kanji_size = '100', '50', '45px'
-    romanji_x, romanji_y, romanji_size = '100', '250', '30px'
+    kanji_x, kanji_y, kanji_size, kanji_color = '100', '50', '45px', 'white'
+    romanji_x, romanji_y, romanji_size, romanji_color = ('100', '250', '30px',
+                                                         'white')
 
     if len(color_dic['kanji']) == 3:
         kanji_size = '40px'
@@ -98,8 +99,11 @@ def generate_svg(color_dic):
     if len(color_dic['romanji']) > 16:
         romanji_size = '22px'
 
+    if color_dic['hls'][1] > 0.95:
+        kanji_color, romanji_color = "#737373", "#737373"
+
     # Add Kanji
-    kanji = ET.Element('text', x=kanji_x, y=kanji_y, fill='white',
+    kanji = ET.Element('text', x=kanji_x, y=kanji_y, fill=kanji_color,
                        style='font-family: osaka, sans-serif;' +
                              'font-size: {};'.format(kanji_size) +
                              'writing-mode: tb')
@@ -107,7 +111,7 @@ def generate_svg(color_dic):
     image.append(kanji)
 
     # Add Romanji
-    romanji = ET.Element('text', x=romanji_x, y=romanji_y, fill='white',
+    romanji = ET.Element('text', x=romanji_x, y=romanji_y, fill=romanji_color,
                        style='font-family: -apple-system, BlinkMacSystemFont,'+
                                           '"Helvetica Neue", sans-serif;' +
                              'font-size: {};'.format(romanji_size) +
@@ -126,13 +130,26 @@ def generate_svg(color_dic):
 
 def generate_markdown(out_fname):
     """ Generate README.MD while generating svg on the fly"""
+
     LINE = '[<img src="./images/{}.svg">](https://irocore.com/{}/)'
     with open('nippon_colors.json', 'r') as fp1:
         with open(out_fname, 'w') as fp2:
+            fp2.write("## 日本の伝統色 (Traditional Colors of Japan)\n" +
+                      "Inspired by [this website](http://nipponcolors.com), " +
+                      "and [this project](https://github.com/syaning/nippon" +
+                      "-colors), I parsed a more useful JSON file with colors" +
+                      " roughly sorted and classified. \n\n" +
+                      "`nippon_colors.py` also generated all the `svg` images" +
+                      " and this `README.md`. You can click the color below" +
+                      " to see more info. \n\n")
+            # Add images
             color_list = load(fp1)
-            for color in color_list:
+            for i in range(len(color_list)):
+                new_line = '\n' if (i % 4 == 3) else ''
+                color = color_list[i]
                 generate_svg(color)
-                fp2.write(LINE.format(color['romanji'], color['romanji']))
+                fp2.write(LINE.format(color['romanji'], color['romanji']) +
+                          new_line)
 
 
 generate_markdown("README.md")
